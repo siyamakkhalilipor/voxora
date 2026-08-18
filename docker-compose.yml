@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: voxora
+      POSTGRES_USER: voxora
+      POSTGRES_PASSWORD: voxora
+    ports: ["5432:5432"]
+    volumes: ["voxora-postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voxora -d voxora"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  livekit:
+    image: livekit/livekit-server:latest
+    command: ["--config", "/etc/livekit.yaml"]
+    volumes:
+      - ./infrastructure/livekit/livekit.yaml:/etc/livekit.yaml:ro
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "50000-50100:50000-50100/udp"
+
+  control-api:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    environment:
+      PORT: 8787
+      HOST: 0.0.0.0
+      CORS_ORIGIN: "*"
+      VOXORA_ADMIN_KEY: change-me-now
+      LIVEKIT_URL: auto
+      LIVEKIT_API_KEY: devkey
+      LIVEKIT_API_SECRET: voxora_dev_secret_change_me_123456789
+      DATABASE_URL: postgresql://voxora:voxora@postgres:5432/voxora
+    ports: ["8787:8787"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      livekit:
+        condition: service_started
+
+volumes:
+  voxora-postgres:

@@ -1,0 +1,14 @@
+{
+  "name": "voxora",
+  "private": true,
+  "version": "0.2.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "npm run build -w @voxora/protocol && npm run build -w @voxora/permissions && npm run build -w @voxora/server && npm run build -w @voxora/desktop",
+    "test": "npm run test -w @voxora/permissions && npm run test -w @voxora/server",
+    "typecheck": "npm run typecheck -w @voxora/protocol && npm run typecheck -w @voxora/permissions && npm run typecheck -w @voxora/server && npm run typecheck -w @voxora/desktop",
+    "dev:server": "npm run dev -w @voxora/server",
+    "dev:desktop": "npm run dev -w @voxora/desktop"
+  },
+  "engines": {"node": ">=22"}
+}
