@@ -30,8 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Typecheck
-        run: npm run typecheck
+      - name: Build shared packages
+        run: |
+          npm run build -w @voxora/protocol
+          npm run build -w @voxora/permissions
+
+      - name: Typecheck applications
+        run: |
+          npm run typecheck -w @voxora/server
+          npm run typecheck -w @voxora/desktop
 
       - name: Test
         run: npm test
